@@ -1,10 +1,13 @@
 makeOwnController = function(maze){
   decideAction = function(cont, maze_) {
-    list(move = sample(c(2, 4, 6, 8), 1), control = cont)
+    #show(maze_)
+    show(cont)
+    m <- readline(prompt="Where do you want to move? 2 - down, 4 - left, 6 - right 8 - up")
+    m <- as.integer(m)
+    list(move = m, control = cont)
   }
   update = function(cont, maze_) {
     return(cont)
   }
-  show(maze)
-  list(decideAction = decideAction, update = update, doRand = TRUE)
+  list(decideAction = decideAction, update = update, doRand = FALSE)
 }
