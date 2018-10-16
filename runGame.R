@@ -9,6 +9,7 @@ runGame = function (maze = makeWobbiesWorld(), control = makeRandomController(ma
     plot(maze, paste("Wobbie's World   Turn:", turn, " Score:", 
                      score), pause)
   while (maze$alive && !maze$finished) {
+    show(control)
     turnRes = takeTurn(maze, control)
     maze = turnRes$maze
     control = turnRes$control
