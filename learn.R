@@ -6,6 +6,8 @@ learn = function (n = 10000, maze = makeWobbiesWorld(), control = makeRandomCont
   turns = c()
   for (i in 1:n) {
     res = runGame(maze, control)
+    
+    
     if (verbose) 
       cat("\nRun:", i, " Turn:", res$turn, " Score:", res$score)
     score = c(score, res$score)

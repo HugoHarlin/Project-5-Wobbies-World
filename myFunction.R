@@ -1,21 +1,29 @@
 myFunction = function (maze){
-  row_names = c('monster', 'wobbie', 'action', 'Q')
-  # nr of legal moves: 84
-  # nr total moves: 26*5
-  nr_states = 26*5*27+1
-  Q = rep(0,nr_states)
   
-  Q[nr_states] = 1000
-  counter = 0
-  for (i in seq(1, nr_states-1, by=27*5)) {
-    for (j in 0:4) {
-      Q[i+j+ counter] = -1000
+  decideAction = function(cont, maze_) {
+    if(is.null(cont$Q)){
+      show("nu skapas Q!!")
+      # nr sates: 27*27
+      # nr moves per state: 5
+      Q = rep(0,27*5*27)
+      cont$Q = Q
     }
-    counter = counter +5
+    
+    nodeNr = match(maxe_$wobbie[1],maze_$wobbie[,1]
+    which(maze_maze)
+    
+    return(list(move = sample(c(2, 4, 6, 8), 1), control = cont))
+  }
+
+  update = function(cont, maze_) {
+    show("maze_")
+    show(maze_)
+    #show("cont")
+    #show(cont)
+    show("----------------------------")
+    return(cont)
   }
   
-
-
-output = 0; 
-return output;
+  return(list(decideAction = decideAction, update = update, doRand = TRUE))
+  
 }
