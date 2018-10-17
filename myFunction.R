@@ -2,13 +2,20 @@ myFunction = function (maze){
   
   decideAction = function(cont, maze_) {
     if(is.null(cont$Q)){
-      show("nu skapas Q!!")
+      #show("nu skapas Q!!")
       # nr sates: 27*27
       # nr moves per state: 5
       Q = rep(0,27*5*27)
       cont$Q = Q
       cont$moves = c(2,4,5,6,8)
-      cont$alpha = 0.01
+      cont$oldQindex = 0
+      # alpha - probability of random move (exploration)
+      # lambda - learning rate 
+      # gamma - Q' learning rate
+      cont$alpha = 0.6
+      cont$lambda = 0.1
+      cont$gamma = 1
+  
     }
     # wobbies and monsters node NR
     nodeNr_wobbie = which(maze_$maze$x == maze_$wobbie[1] & maze_$maze$y == maze_$wobbie[2])
@@ -16,13 +23,13 @@ myFunction = function (maze){
     
     # Q-vals of the five possible moves in this state (5 element vector)
     Q_vals = cont$Q[(nodeNr_monster-1)*27*5 + (nodeNr_wobbie-1)*5+ c(1,2,3,4,5)]
-    show("Q_vals")
-    show(Q_vals)
+    #show("Q_vals")
+    #show(Q_vals)
     
     # selecting the best move
     moves = which(max(Q_vals) == Q_vals)
-    show("moves")
-    show(moves)
+    #show("moves")
+    #show(moves)
     if(length(moves) > 1){
       bestMove = sample(moves,1)
     }
@@ -30,26 +37,44 @@ myFunction = function (maze){
       bestMove = moves
     }
     
-    show("bestMove")
-    show(bestMove)
+    #show("bestMove")
+    #show(bestMove)
     finalMove = cont$moves[bestMove]
     
     # sampling random move with probability alpha
     if(runif(1) < cont$alpha){
       finalMove = sample(cont$moves,1)
     }
-    show("finalMove")
-    show(finalMove)
+    #show("finalMove")
+    #show(finalMove)
+    
+    #saving oldQindex
+    
+    cont$oldQindex = (nodeNr_monster-1)*27*5 + (nodeNr_wobbie-1)*5+ bestMove
+    #show("cont$oldQindex")
+    #show(cont$oldQindex)
     
     return(list(move = finalMove, control = cont))
   }
   
   update = function(cont, maze_) {
-    #show("maze_")
-    #show(maze_)
-    #show("cont")
-    #show(cont)
-    show("----------------------------")
+    # wobbies and monsters node NR
+    nodeNr_wobbie = which(maze_$maze$x == maze_$wobbie[1] & maze_$maze$y == maze_$wobbie[2])
+    nodeNr_monster = which(maze_$maze$x == maze_$monster1[1] & maze_$maze$y == maze_$monster1[2])
+    
+    # Q-vals of the five possible moves in this state (5 element vector)
+    Q_prime = cont$Q[(nodeNr_monster-1)*27*5 + (nodeNr_wobbie-1)*5 + c(1,2,3,4,5)]
+    Q_prime = max(Q_prime)*cont$gamma + maze_$reward
+
+    cont$Q[cont$oldQindex] = cont$Q[cont$oldQindex] - cont$lambda*(cont$Q[cont$oldQindex] - Q_prime)
+    cont$alpha = cont$alpha -0.001
+    if( cont$lambda > 0.01)
+      cont$lambda = cont$lambda -0.001
+    ##show("maze_")
+    ##show(maze_)
+    ##show("cont")
+    ##show(cont)
+    #show("----------------------------")
     return(cont)
   }
   
