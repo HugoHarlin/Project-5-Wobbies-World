@@ -13,10 +13,15 @@ myFunction = function (maze){
       # lambda - learning rate 
       # gamma - Q' learning rate
       cont$alpha = 0.6
-      cont$lambda = 0.1
+      cont$lambda = 0.01
       cont$gamma = 1
-  
+      
+      visits = rep(1,27*5*27)
+      cont$visits = visits
+      
+      cont$doRand = TRUE
     }
+    
     # wobbies and monsters node NR
     nodeNr_wobbie = which(maze_$maze$x == maze_$wobbie[1] & maze_$maze$y == maze_$wobbie[2])
     nodeNr_monster = which(maze_$maze$x == maze_$monster1[1] & maze_$maze$y == maze_$monster1[2])
@@ -42,19 +47,25 @@ myFunction = function (maze){
     finalMove = cont$moves[bestMove]
     
     # sampling random move with probability alpha
-    if(runif(1) < cont$alpha){
-      finalMove = sample(cont$moves,1)
+    
+    
+    if (cont$doRand){
+      if(runif(1) < cont$alpha){
+        finalMove = sample(cont$moves,1)
+      }
     }
+    
     #show("finalMove")
     #show(finalMove)
     
     #saving oldQindex
     
-    cont$oldQindex = (nodeNr_monster-1)*27*5 + (nodeNr_wobbie-1)*5+ bestMove
+    cont$oldQindex = (nodeNr_monster-1)*27*5 + (nodeNr_wobbie-1)*5 + which(finalMove == cont$moves)
+    cont$visits[cont$oldQindex] = cont$visits[cont$oldQindex] + 1
     #show("cont$oldQindex")
     #show(cont$oldQindex)
     
-    return(list(move = finalMove, control = cont))
+    return(list(move = finalMove, control = cont, doRand = TRUE))
   }
   
   update = function(cont, maze_) {
@@ -66,10 +77,29 @@ myFunction = function (maze){
     Q_prime = cont$Q[(nodeNr_monster-1)*27*5 + (nodeNr_wobbie-1)*5 + c(1,2,3,4,5)]
     Q_prime = max(Q_prime)*cont$gamma + maze_$reward
 
+    cont$lambda = 60/(60 + cont$visits[cont$oldQindex])
+    cont$alpha = 60/(60 + cont$visits[cont$oldQindex])
+    #show("lambda")
+    #show(cont$lambda)
+    
     cont$Q[cont$oldQindex] = cont$Q[cont$oldQindex] - cont$lambda*(cont$Q[cont$oldQindex] - Q_prime)
-    cont$alpha = cont$alpha -0.001
-    if( cont$lambda > 0.01)
-      cont$lambda = cont$lambda -0.001
+    #if (maze_$finished == TRUE || maze_$alive == FALSE){
+      #show("alpha")
+      #show(cont$alpha)
+      #
+      #cont$alpha = cont$alpha - 0.005
+      #if (cont$alpha > 0.001){
+      #   cont$alpha = cont$alpha - 0.0008
+      #} else {
+      #  cont$alpha = cont$alpha/2
+      #}
+      #cont$alpha = cont$alpha - 0.0001
+    #}
+    #if (cont$alpha<0.001){
+    #  cont$lambda = 0.004;
+    #}
+    #if( cont$lambda > 0.01)
+    #  cont$lambda = cont$lambda -0.01
     ##show("maze_")
     ##show(maze_)
     ##show("cont")
